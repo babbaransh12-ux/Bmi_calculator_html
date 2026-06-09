@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BioMetric Pro — Advanced BMI Calculator</title>
+  <meta name="description" content="Track your BMI with multi-user support, historical trends, and beautiful Chart.js visualizations." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- Background -->
+  <div class="bmi-bg">
+    <div class="bmi-blob blob-1"></div>
+    <div class="bmi-blob blob-2"></div>
+    <div class="bmi-blob blob-3"></div>
+  </div>
+
+  <!-- ── App ────────────────────────────────────────────────── -->
+  <div id="bmi-app">
+
+    <!-- Header -->
+    <header class="bmi-header">
+      <div class="bmi-logo">
+        <div class="bmi-logo-icon"><i class="fas fa-heartbeat"></i></div>
+        <div>
+          <h1 class="bmi-logo-title">BioMetric <span>Pro</span></h1>
+          <p class="bmi-logo-sub">Advanced BMI Tracker</p>
+        </div>
+      </div>
+      <div class="profile-area">
+        <div class="profile-switcher">
+          <button class="profile-btn" id="profile-dropdown-btn">
+            <i class="fas fa-user-circle"></i>
+            <span id="current-profile-name">Select Profile</span>
+            <i class="fas fa-chevron-down"></i>
+          </button>
+          <div class="profile-dropdown" id="profile-dropdown">
+            <div id="profile-list"><!-- JS populated --></div>
+            <button class="add-profile-btn" id="add-profile-btn">
+              <i class="fas fa-user-plus"></i> Add New Profile
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Grid -->
+    <div class="bmi-main">
+
+      <!-- ── Left Column: Input + Gauge ──────────────────── -->
+      <div class="left-col">
+
+        <!-- Input Card -->
+        <div class="card input-card">
+          <div class="card-header">
+            <h2><i class="fas fa-edit"></i> Enter Measurements</h2>
+            <!-- Unit Toggle -->
+            <div class="unit-toggle">
+              <button class="unit-btn active" id="btn-metric" data-unit="metric">Metric</button>
+              <button class="unit-btn" id="btn-imperial" data-unit="imperial">Imperial</button>
+            </div>
+          </div>
+
+          <div class="input-grid">
+            <!-- Weight -->
+            <div class="input-group">
+              <label for="weight-input">
+                <i class="fas fa-weight-hanging"></i> Weight
+              </label>
+              <div class="input-with-unit">
+                <input type="number" id="weight-input" placeholder="70" min="1" max="500" step="0.1" />
+                <span class="unit-label" id="weight-unit">kg</span>
+              </div>
+            </div>
+
+            <!-- Height -->
+            <div class="input-group" id="height-metric-group">
+              <label for="height-input">
+                <i class="fas fa-ruler-vertical"></i> Height
+              </label>
+              <div class="input-with-unit">
+                <input type="number" id="height-input" placeholder="175" min="1" max="300" step="0.1" />
+                <span class="unit-label" id="height-unit">cm</span>
+              </div>
+            </div>
+
+            <!-- Height Imperial -->
+            <div class="input-group hidden" id="height-imperial-group">
+              <label><i class="fas fa-ruler-vertical"></i> Height</label>
+              <div class="imperial-height">
+                <div class="input-with-unit">
+                  <input type="number" id="height-ft" placeholder="5" min="1" max="9" />
+                  <span class="unit-label">ft</span>
+                </div>
+                <div class="input-with-unit">
+                  <input type="number" id="height-in" placeholder="9" min="0" max="11" />
+                  <span class="unit-label">in</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Age -->
+            <div class="input-group">
+              <label for="age-input"><i class="fas fa-birthday-cake"></i> Age</label>
+              <div class="input-with-unit">
+                <input type="number" id="age-input" placeholder="25" min="1" max="120" />
+                <span class="unit-label">yrs</span>
+              </div>
+            </div>
+
+            <!-- Gender -->
+            <div class="input-group">
+              <label><i class="fas fa-venus-mars"></i> Gender</label>
+              <div class="gender-select">
+                <button class="gender-btn active" id="gender-male" data-gender="male">
+                  <i class="fas fa-mars"></i> Male
+                </button>
+                <button class="gender-btn" id="gender-female" data-gender="female">
+                  <i class="fas fa-venus"></i> Female
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Validation message -->
+          <p class="validation-msg" id="validation-msg"></p>
+
+          <button class="calculate-btn" id="calculate-btn">
+            <i class="fas fa-calculator"></i> Calculate BMI
+          </button>
+        </div>
+
+        <!-- Result / Gauge Card -->
+        <div class="card result-card" id="result-card">
+          <h2 class="result-title">Your BMI Result</h2>
+
+          <!-- Gauge -->
+          <div class="gauge-container">
+            <svg class="gauge-svg" viewBox="0 0 220 140" xmlns="http://www.w3.org/2000/svg">
+              <!-- Background arc segments -->
+              <path d="M 20 120 A 90 90 0 0 1 65 37" stroke="#3b82f6" stroke-width="14" fill="none" stroke-linecap="round" opacity="0.3"/>
+              <path d="M 65 37 A 90 90 0 0 1 155 37" stroke="#22c55e" stroke-width="14" fill="none" stroke-linecap="round" opacity="0.3"/>
+              <path d="M 155 37 A 90 90 0 0 1 200 120" stroke="#f59e0b" stroke-width="14" fill="none" stroke-linecap="round" opacity="0.3"/>
+              <!-- Active arc -->
+              <path id="gauge-arc" d="M 20 120 A 90 90 0 0 1 20 120" stroke="#22c55e" stroke-width="14" fill="none" stroke-linecap="round"/>
+              <!-- Needle -->
+              <line id="gauge-needle" x1="110" y1="118" x2="110" y2="45" stroke="white" stroke-width="3" stroke-linecap="round" transform="rotate(0, 110, 118)" opacity="0"/>
+              <circle cx="110" cy="118" r="6" fill="white" opacity="0" id="gauge-dot"/>
+              <!-- BMI Value -->
+              <text id="gauge-bmi-text" x="110" y="105" text-anchor="middle" class="gauge-bmi-num" font-size="32" fill="white" font-family="Outfit, sans-serif" font-weight="700">--</text>
+              <text id="gauge-category-text" x="110" y="125" text-anchor="middle" class="gauge-cat-text" font-size="10" fill="rgba(255,255,255,0.7)" font-family="Inter, sans-serif">Calculate to see result</text>
+            </svg>
+            <!-- Labels -->
+            <div class="gauge-labels">
+              <span class="gauge-label underweight">Underweight<br/>&lt;18.5</span>
+              <span class="gauge-label normal">Normal<br/>18.5–24.9</span>
+              <span class="gauge-label overweight">Overweight<br/>25–29.9</span>
+              <span class="gauge-label obese">Obese<br/>≥30</span>
+            </div>
+          </div>
+
+          <!-- Category Badge -->
+          <div class="category-badge" id="category-badge" style="display:none">
+            <span id="category-icon">💚</span>
+            <span id="category-label">Normal Weight</span>
+          </div>
+
+          <!-- Healthy Range -->
+          <div class="healthy-range" id="healthy-range" style="display:none">
+            <div class="range-item">
+              <span class="range-label">Healthy Range</span>
+              <span class="range-val" id="healthy-range-val">—</span>
+            </div>
+            <div class="range-item">
+              <span class="range-label">To reach Normal</span>
+              <span class="range-val" id="to-normal-val">—</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Right Column: Stats + Chart + History ─────────── -->
+      <div class="right-col">
+
+        <!-- Stats Row -->
+        <div class="stats-grid">
+          <div class="stat-card" id="stat-current">
+            <div class="stat-icon"><i class="fas fa-bullseye"></i></div>
+            <div class="stat-info">
+              <span class="stat-val" id="stat-bmi-val">—</span>
+              <span class="stat-label">Current BMI</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-arrow-down"></i></div>
+            <div class="stat-info">
+              <span class="stat-val" id="stat-min">—</span>
+              <span class="stat-label">Lowest BMI</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-arrow-up"></i></div>
+            <div class="stat-info">
+              <span class="stat-val" id="stat-max">—</span>
+              <span class="stat-label">Highest BMI</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
+            <div class="stat-info">
+              <span class="stat-val" id="stat-avg">—</span>
+              <span class="stat-label">Average BMI</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chart Card -->
+        <div class="card chart-card">
+          <div class="card-header">
+            <h2><i class="fas fa-chart-area"></i> BMI Trend</h2>
+            <div class="chart-legend">
+              <span class="legend-dot" style="background:#3b82f6"></span>Underweight
+              <span class="legend-dot" style="background:#22c55e"></span>Normal
+              <span class="legend-dot" style="background:#f59e0b"></span>Overweight
+              <span class="legend-dot" style="background:#ef4444"></span>Obese
+            </div>
+          </div>
+          <div class="chart-wrapper">
+            <canvas id="bmi-chart"></canvas>
+            <div class="chart-placeholder" id="chart-placeholder">
+              <i class="fas fa-chart-line"></i>
+              <p>Calculate your BMI to start tracking trends</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- History Card -->
+        <div class="card history-card">
+          <div class="card-header">
+            <h2><i class="fas fa-history"></i> History</h2>
+            <button class="export-btn" id="export-btn" title="Export CSV">
+              <i class="fas fa-download"></i> Export CSV
+            </button>
+          </div>
+          <div class="history-table-wrap">
+            <table class="history-table" id="history-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Weight</th>
+                  <th>Height</th>
+                  <th>BMI</th>
+                  <th>Category</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="history-body">
+                <tr><td colspan="6" class="empty-row">No history yet. Calculate your first BMI!</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── New Profile Modal ─────────────────────────────────── -->
+  <div class="modal-overlay" id="profile-modal">
+    <div class="modal bmi-modal">
+      <div class="modal-header">
+        <h2><i class="fas fa-user-plus"></i> New Profile</h2>
+        <button class="modal-close" id="close-profile-modal"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="setting-group">
+          <label for="profile-name-input">Profile Name</label>
+          <input type="text" id="profile-name-input" placeholder="e.g., John Doe" class="text-field" />
+        </div>
+        <div class="modal-actions">
+          <button id="create-profile-btn" class="btn-primary"><i class="fas fa-check"></i> Create Profile</button>
+          <button id="cancel-profile-btn" class="btn-secondary">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="bmi-toast" id="bmi-toast">
+    <i class="fas fa-check-circle"></i>
+    <span id="bmi-toast-msg">Saved!</span>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="js/bmi.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
